@@ -12,7 +12,7 @@ int strToInt(const char *str) {
 
 	if (ss.fail() || out > 255 || out < 0) {
 		std::cout << "Invalid arguments!" << std::endl;
-		return 0;
+		exit(1);
 	}
 
 	return out;
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 	if (GetDeviceGammaRamp(dc, &oldRamp) != TRUE) {
 		std::cerr << "Failed to get the old gamma ramp!" << std::endl;
 		std::cin.get();
-		exit(1);
+		return 1;
 	}
 
 	int gamma = 0;
