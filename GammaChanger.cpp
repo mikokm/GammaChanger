@@ -1,17 +1,18 @@
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 #include <Windows.h>
 #include <Wingdi.h>
 
-int strToInt(const char *str) {
+double strToDouble(const char *str) {
 	std::stringstream ss(str);
 
-	int out;
+	double out;
 	ss >> out;
 
-	if (ss.fail() || out > 255 || out < 0) {
-		std::cout << "Invalid arguments!" << std::endl;
+	if (ss.fail()) {
+		std::cout << "Invalid argument type: " << str << std::endl;
 		exit(1);
 	}
 
@@ -28,19 +29,19 @@ HDC getPrimaryMonitorDC() {
 	return CreateDC(info.szDevice, NULL, NULL, 0);
 }
 
-void setGamma(HDC dc, int gamma) {
+void setGamma(HDC dc, double gamma) {
 	WORD ramp[3][256];
 
 	for (int i = 0; i < 256; ++i) {
-		int value = i * (256 + gamma);
+		double value = std::pow(i / 256.0, 1.0 / gamma) * 65535.0 + 0.5;
 
 		if (value > 65535) {
 			value = 65535;
 		}
 
-		ramp[0][i] = value;
-		ramp[1][i] = value;
-		ramp[2][i] = value;
+		ramp[0][i] = static_cast<int> (value);
+		ramp[1][i] = static_cast<int> (value);
+		ramp[2][i] = static_cast<int> (value);
 	}
 
 	SetDeviceGammaRamp(dc, &ramp);
@@ -56,19 +57,22 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	int gamma = 0;
+	double gamma = 0.0;
+
 	if (argc == 2) {
-		gamma = strToInt(argv[1]);
+		gamma = strToDouble(argv[1]);
 	}
-	else {
+
+	if (argc != 2 || gamma > 3.0 || gamma < 0.1) {
 		std::cout << "Usage:\n"
 			<< "GammaChanger <gamma>\n"
-			<< "The gamma value must be in between 0 and 255." << std::endl;
+			<< "The gamma value must be in between 0.1 and 3.0." << std::endl;
 		std::cin.get();
 		return 0;
 	}
 
 	setGamma(dc, gamma);
+
 	std::cout << "Gamma ramp set, press enter to exit." << std::endl;
 	std::cin.get();
 	SetDeviceGammaRamp(dc, &oldRamp);
