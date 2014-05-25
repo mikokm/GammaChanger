@@ -153,9 +153,9 @@ int main(int argc, char **argv) {
 	}
 	else {
 		std::cerr << "Invalid mode: " << mode << std::endl;
+		std::cin.get();
 	}
 
-	std::cin.get();
 	DeleteDC(dc);
 
 	return 0;
