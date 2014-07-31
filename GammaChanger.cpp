@@ -7,6 +7,8 @@
 #include <Wingdi.h>
 #include <Shlobj.h>
 
+#include "ADLWrapper.hpp"
+
 double strToDouble(const char *str) {
 	std::stringstream ss(str);
 
@@ -139,9 +141,12 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
+	ADLWrapper adl;
+
 	if (mode == "load") {
 		std::cout << "Loading the saved gamma ramp." << std::endl;
 		loadGammaRamp(dc);
+		adl.setSaturdation(100);
 	}
 	else if (mode == "save") {
 		std::cout << "Saving the current gamma ramp." << std::endl;
@@ -150,6 +155,7 @@ int main(int argc, char **argv) {
 	else if (mode == "set") {
 		std::cout << "Setting a new gamma ramp." << std::endl;
 		setGammaRamp(dc, gamma);
+		adl.setSaturdation(200);
 	}
 	else {
 		std::cerr << "Invalid mode: " << mode << std::endl;
