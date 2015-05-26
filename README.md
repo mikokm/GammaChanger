@@ -1,4 +1,4 @@
 GammaChanger
 ============
 
-A simple cli utility that changes Windows gamma ramp.
+A tool that changes gamma ramp and display driver saturation settings.
