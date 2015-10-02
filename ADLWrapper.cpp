@@ -62,13 +62,13 @@ ADLWrapper::~ADLWrapper() {
 
 
 bool ADLWrapper::loadDriver() {
-	m_hdll = LoadLibrary(L"atiadlxx.dll");
+	m_hdll = LoadLibrary("atiadlxx.dll");
 	if (m_hdll == NULL) {
-		std::wcerr << "Failed to load 64bit AMD driver library!" << std::endl;
+		std::cerr << "Failed to load 64bit AMD driver library!" << std::endl;
 
-		m_hdll = LoadLibrary(L"atiadlxy.dll");
+		m_hdll = LoadLibrary("atiadlxy.dll");
 		if (m_hdll == NULL) {
-			std::wcerr << "Failed to load 32bit AMD driver library!" << std::endl;
+			std::cerr << "Failed to load 32bit AMD driver library!" << std::endl;
 			return false;
 		}
 	}
@@ -88,7 +88,7 @@ bool ADLWrapper::loadDriver() {
 	}
 
 	if (ADL_Main_Control_Create(ADL_Main_Memory_Alloc, 1) != ADL_OK) {
-		std::wcerr << "Failed to create ADL main control!" << std::endl;
+		std::cerr << "Failed to create ADL main control!" << std::endl;
 		return false;
 	}
 
@@ -100,16 +100,16 @@ void ADLWrapper::releaseDriver() {
 	FreeLibrary(m_hdll);
 }
 
-bool ADLWrapper::setSaturdation(int saturdation) {
+bool ADLWrapper::setSaturation(int saturation) {
 	int adapterCount;
 
 	if (ADL_Adapter_NumberOfAdapters_Get(&adapterCount) != ADL_OK) {
-		std::cerr << "Failed to get the adapter count!" << std::endl;
+		std::cerr << "Failed to get the display adapter count!" << std::endl;
 		return false;
 	}
 
 	if (adapterCount <= 0) {
-		std::cerr << "Adapter count is not a positive integer!" << std::endl;
+		std::cerr << "The display Adapter count is not a positive integer!" << std::endl;
 		return false;
 	}
 
@@ -118,8 +118,8 @@ bool ADLWrapper::setSaturdation(int saturdation) {
 
 	int primary;
 	if (ADL_Adapter_Primary_Get(&primary) != ADL_OK) {
-		std::cerr << "Cannot retrieve primary adapter!" << std::endl;
-		return 1;
+		std::cerr << "Cannot retrieve the primary adapter!" << std::endl;
+		return false;
 	}
 
 	int index = -1;
@@ -132,7 +132,7 @@ bool ADLWrapper::setSaturdation(int saturdation) {
 
 	if (index == -1) {
 		std::cerr << "Failed to get the display adapter index!" << std::endl;
-		return 1;
+		return false;
 	}
 
 	int displayCount;
@@ -140,18 +140,22 @@ bool ADLWrapper::setSaturdation(int saturdation) {
 
 	if (ADL_Display_DisplayInfo_Get(primary, &displayCount, &displayInfo, 0) != ADL_OK) {
 		std::cerr << "Failed to get display info!" << std::endl;
-		return 1;
+		return false;
 	}
 
 	int dpyIndex = displayInfo[0].displayID.iDisplayLogicalIndex;
 
 	int cur, def, min, max, step;
 	if (ADL_OK == ADL_Display_Color_Get(primary, dpyIndex, ADL_DISPLAY_COLOR_SATURATION, &cur, &def, &min, &max, &step)) {
-		std::cout << "cur:" << cur << " def:" << def << " min:" << min << " max:" << max << " step:" << step << std::endl;
-		std::cin.get();
+		std::cout << "Current saturation: " << cur << std::endl;
 	}
 
-	ADL_Display_Color_Set(primary, displayInfo[0].displayID.iDisplayLogicalIndex, ADL_DISPLAY_COLOR_SATURATION, saturdation);
+	if (saturation < min || saturation > max) {
+		throw std::runtime_error("Invalid saturation value!");
+	}
+
+	ADL_Display_Color_Set(primary, displayInfo[0].displayID.iDisplayLogicalIndex, ADL_DISPLAY_COLOR_SATURATION, saturation);
+	std::cout << "Setting saturation to: " << saturation << std::endl;
 
 	ADL_Main_Memory_Free(reinterpret_cast<void**>(&displayInfo));
 	delete[] adapterInfo;

@@ -8,7 +8,7 @@ public:
 	ADLWrapper();
 	~ADLWrapper();
 	
-	bool setSaturdation(int saturdation);
+	bool setSaturation(int saturation);
 
 private:
 	bool loadDriver();
