@@ -5,11 +5,11 @@ GammaChanger is a tool that changes Windows gamma ramp and AMD display driver sa
 
 **GammaChanger.exe load \<filename\>**
 
-Loads the file containing the saved gamma ramp and applies it. Sets the saturation setting to 100.
+Reads the given file containing a saved gamma ramp and applies it. Sets the saturation setting to 100.
 
 **GammaChanger.exe save \<filename\>**
 
-Writes the current gamma ramp into the file.
+Writes the current gamma ramp to the given file.
 
 **GammaChanger.exe set \<gamma\>**
 
